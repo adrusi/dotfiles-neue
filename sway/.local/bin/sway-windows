@@ -1,0 +1,10 @@
+#!/bin/sh
+swaymsg -t get_tree | jq '
+    .nodes[].nodes[]
+    | if .nodes
+      then [recurse(.nodes[])]
+      else []
+      end + .floating_nodes
+    | .[]
+    | select(.nodes==[])
+'

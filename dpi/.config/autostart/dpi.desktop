@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=DPI
+Comment=fuckfuckfuckfuckfugh
+Exec=/usr/bin/auto-xrandr
+Terminal=false
+Type=Application
+X-GNOME-Autostart-enabled=true

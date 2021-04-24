@@ -1,0 +1,14 @@
+output 'Sharp Corporation 0x14AF 0x00000000' \
+    scale 1.0 \
+    pos 1600 1440 \
+    mode 1920x1200
+output 'Goldstar Company Ltd LG HDR 4K 0x0000E734' \
+    scale 1.5 \
+    pos 0 0 \
+    mode 3840x2160 \
+    adaptive_sync on
+output 'Goldstar Company Ltd LG HDR 4K 0x0000E727' \
+    scale 1.5 \
+    pos 2560 0 \
+    mode 3840x2160 \
+    adaptive_sync on

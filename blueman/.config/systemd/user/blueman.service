@@ -1,0 +1,10 @@
+[Unit]
+Description=Bluetooth manager
+BindsTo=sway-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/blueman-applet
+
+[Install]
+WantedBy=sway-session.target

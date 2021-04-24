@@ -1,0 +1,57 @@
+#main-window[tabsintitlebar="true"]:not([extradragspace="true"]) #TabsToolbar > .toolbar-items {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#main-window:not([tabsintitlebar="true"]) #TabsToolbar {
+    visibility: collapse !important;
+}
+
+#sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"] #sidebar-header {
+    display: none;
+}
+
+#titlebar {
+/*     margin-bottom: -33px; */
+}
+
+.titlebar-buttonbox-container {
+    display: none;
+}
+
+#TabsToolbar, #titlebar, #main-window, #navigator-toolbox {
+    -moz-appearance: none !important;  
+    background-color: transparent !important;  
+    background-image: none !important;  
+    box-shadow: none !important;  
+    border: none !important;  
+}
+
+#nav-bar {
+    background: transparent !important;
+    font-family: "IBM Plex Sans Light";
+}
+
+#sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"], #sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"] browser {
+    background: transparent !important;
+}
+
+#nav-bar {
+    background: rgba(46,52,64,1.0) !important;
+    border-bottom: 1px solid rgba(35,39,48,1.0) !important;
+}
+
+#nav-bar:-moz-window-inactive {
+    background: rgba(46,52,64,0.8) !important;
+    border-bottom: 1px solid rgba(35,39,48,0.8) !important;
+}
+
+#browser, #sidebar-box, #sidebar, #sidebar * {
+    background: transparent !important;
+}
+
+@-moz-document url("chrome://browser/content/webext-panels.xhtml") {
+    :root, html, body {
+        background: transparent !important;
+    }
+}

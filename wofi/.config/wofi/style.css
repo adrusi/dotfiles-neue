@@ -1,0 +1,30 @@
+window {
+    background: rgba(46,52,64,0.8);
+    color: #d8dee9;
+}
+
+#input {
+    background: transparent;
+    border: 1px solid #d8dee9;
+    margin: 0 12px 12px 12px;
+}
+
+#text {
+    margin: 0 12px 0 12px;
+}
+
+#img {
+    margin-left: 12px;
+}
+
+#text:selected {
+    color: rgba(46,52,64,1.0);
+}
+
+#entry:selected {
+    background: #d8dee9;
+    color: rgba(46,52,64,0.8);
+    border: none;
+    outline: none;
+    border-radius: 0;
+}

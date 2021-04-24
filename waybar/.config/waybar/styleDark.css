@@ -1,0 +1,83 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: IBM Plex Sans Light, sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+window#waybar {
+    background: rgba(46,52,64,0.8);
+    color: #d8dee9;
+}
+
+#workspaces {
+    margin-left: 8px;
+    margin-right: 16px;
+}
+
+#workspaces button {
+    margin: 6px 0 8px 16px;
+    padding: 0px 1px 0px 1px;
+    color: rgba(207, 214, 230, 0.5);
+    background: transparent;
+}
+
+
+#workspaces button.focused {
+    color: rgba(207, 214, 230, 1);
+}
+
+#workspaces button:hover {
+    background: transparent;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+#mode {
+    margin: 1px 0 1px 0;
+    text-shadow: 0 0 2px #5288e2;
+}
+
+#clock, #battery, #cpu, #memory, #network, #pulseaudio, #custom-wofi, #tray, #mode {
+    margin: 0px 16px 0px 0px;
+    border-bottom: 1px solid transparent;
+}
+
+#clock {
+    margin-right: 20px;
+}
+
+#custom-wofi, #mode, #pulseaudio, #network, #battery, #clock {
+    border-top: 2px solid transparent;
+}
+
+#pulseaudio {
+    margin-left: 16px;
+}
+
+#battery.critical {
+    color: #e06c75;
+}
+#battery.charging {
+    color: #5288e2;
+}
+#battery.full {
+    margin: 0px 0px 0px 0px;
+}
+
+/*#network {
+    border-top: 1px solid transparent;
+}*/
+#network.disconnected {
+    /*margin: 0px 0px 0px 0px;*/
+    color: rgba(75, 81, 98, 0.73);
+}
+
+
+#pulseaudio.muted {
+    /*margin: 0px 0px 0px 0px;
+    color: rgba(75, 81, 98, 0);*/
+    color: rgba(75, 81, 98, 0.73);
+}
+

@@ -1,0 +1,46 @@
+#main-window[tabsintitlebar="true"]:not([extradragspace="true"]) #TabsToolbar > .toolbar-items {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#main-window:not([tabsintitlebar="true"]) #TabsToolbar {
+    visibility: collapse !important;
+}
+
+#sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"] #sidebar-header {
+    display: none;
+}
+
+#titlebar {
+    margin-bottom: -33px;
+}
+
+#PanelUI-button {
+    margin-right: 42px;
+}
+
+.titlebar-buttonbox-container {
+    margin-top: 7px;
+    margin-right: 12px;
+}
+
+/* #TabsToolbar, #titlebar, #main-window, #navigator-toolbox {
+    -moz-appearance: none !important;  
+    background-color: transparent !important;  
+    background-image: none !important;  
+    box-shadow: none !important;  
+    border: none !important;  
+}
+
+#nav-bar {
+    background: transparent !important;
+}
+
+#sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"], #sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"] browser {
+    background: transparent !important;
+} */
+
+#nav-bar {
+    background: #313743 !important;
+    border-bottom-color: #262933 !important;
+}

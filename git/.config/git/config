@@ -1,0 +1,7 @@
+[core]
+	excludesfile = ~/.config/git/ignore
+[init]
+	defaultBranch = master
+[user]
+	email = adrian@adrusi.com
+	name = Adrian Sinclair

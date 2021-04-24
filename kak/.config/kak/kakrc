@@ -1,0 +1,289 @@
+source "%val{config}/plugins/plug.kak/rc/plug.kak"
+plug robertmeta/plug.kak "noload"
+
+plug andreyorst/fzf.kak config %{
+    require-module fzf
+    require-module fzf_vcs
+    require-module x11
+    set-option global fzf_file_command 'rg'
+    set-option global fzf_preview false
+    set-option global fzf_default_opts '--border=sharp --color=dark,bg:-1'
+    declare-option str fzf_method f
+    declare-option -hidden str fzf_default_termcmd
+    define-command -hidden launch-fzf %{
+        require-module x11
+        set-option global fzf_default_termcmd %opt{termcmd}
+        set-option global termcmd "alacritty --class kak-fzf -owindow.padding.x=0 -owindow.padding.y=0 -obackground_opacity=0.8 -e sh -c"
+        fzf-mode
+        execute-keys %opt{fzf_method}
+        set-option global termcmd %opt{fzf_default_termcmd}
+    }
+    map global normal <c-p> ': launch-fzf<ret>'
+    map global normal <c-a-p> ': fzf-mode<ret>'
+}
+
+plug eraserhd/parinfer-rust do %{
+    cargo build --release
+}
+
+plug eraserhd/rep
+
+plug kak-lsp/kak-lsp do %{
+    cargo build --release --locked
+    cargo install --force --path . --root ~/.local
+} config %{
+    set global lsp_diagnostic_line_error_sign '║'
+    set global lsp_diagnostic_line_warning_sign '┊'
+
+    define-command lsp-restart -docstring 'restart lsp server' %{ lsp-stop; lsp-start }
+    hook global KakEnd .* lsp-exit
+
+    hook global WinSetOption filetype=(haskell|rust|typescript|zig) %{
+        lsp-enable-window
+        lsp-auto-hover-enable
+        lsp-auto-signature-help-enable
+        lsp-auto-hover-insert-mode-disable
+        echo -debug "Enabling LSP for filtetype %opt{filetype}"
+    }
+
+    hook global WinSetOption filetype=zig %{
+        set-option buffer formatcmd 'zig fmt'
+        set-option window lsp_auto_highlight_references true
+        set-option global lsp_server_configuration zls.zig_lib_path="/usr/lib/zig"
+        set-option -add global lsp_server_configuration zls.warn_style=true
+        set-option -add global lsp_server_configuration zls.enable_semantic_tokens=true
+        hook window -group semantic-tokens BufReload .* lsp-semantic-tokens
+        hook window -group semantic-tokens NormalIdle .* lsp-semantic-tokens
+        hook window -group semantic-tokens InsertIdle .* lsp-semantic-tokens
+        hook -once -always window WinSetOption filetype=.* %{
+            remove-hooks window semantic-tokens
+        }
+    }
+}
+
+plug Delapouite/kakoune-palette
+
+# plug ul/kak-tree do %{
+#     git submodule update --init --recursive
+#     cargo install --path . --force --features "bash c clojure css go haskell html javascript json python rust typescript"
+# }
+
+try %{ require-module kitty }
+map global normal <c-n> ': new<ret>'
+
+colorscheme adrusi
+add-highlighter global/linenumbers number-lines
+set-option -add global ui_options ncurses_assistant=off
+
+# Copy-pasta
+map global user y '$wl-copy<ret>'
+map global user p '|wl-paste<ret>'
+map global user <a-y> '$ix|wl-copy<ret>'
+
+# Commenting
+define-command -hidden adrusi-comment-line %{
+    try %{
+        comment-line
+    } catch %{
+        try %{
+            evaluate-commands -draft %{
+                execute-keys <a-s>
+                comment-block
+            }
+        } catch %{
+            evaluate-commands -draft %{
+                execute-keys xH
+                comment-block
+            }
+        }
+    }
+}
+map global user c ': adrusi-comment-line<ret>'
+
+# Wrapping
+declare-option int wrapcol %opt{autowrap_column}
+
+define-command highlight-wrapcol %{
+    set-option window autowrap_column %opt{wrapcol}
+    remove-highlighter window/wrapcol
+    add-highlighter window/wrapcol column \
+                    %sh{ echo $(( $kak_opt_wrapcol + 1 )) } \
+                    LineNumberCursor
+}
+hook global WinCreate .* highlight-wrapcol
+hook global WinSetOption wrapcol=.* highlight-wrapcol
+
+declare-option bool autowrap false
+
+hook global WinSetOption autowrap=true %{
+    hook -group autowrap window InsertChar [^\n] %{ try %{
+        execute-keys -draft "hGh<a-k>.{%opt{wrapcol},}<ret><a-;><a-b>i<ret><esc>"
+    } }
+}
+hook global WinSetOption autowrap=false %{ try %{
+    remove-hooks window autowrap
+} }
+
+define-command wrap %{
+    evaluate-commands %sh{
+        format_cmd="$(printf %s "${kak_opt_autowrap_fmtcmd}" \
+            | sed 's/%c/${kak_opt_autowrap_column}/g')"
+        printf %s "
+            evaluate-commands -draft %{
+                execute-keys <a-x><a-j> '| ${format_cmd}<ret>'
+                try %{ execute-keys s\h+$<ret> d }
+            }
+            select '${kak_reg_m}'
+        "
+    }
+}
+
+map global user w :wrap<ret>
+
+# soft-wrap by default because the line scrolling is usually just annoying
+add-highlighter global/softwrap wrap -indent -marker "⤷"
+
+# Soft-tabs
+declare-option bool soft_tabs true
+
+hook global WinSetOption soft_tabs=true %{
+    hook -group softtab window InsertChar \t %{ try %{
+        execute-keys -draft h %opt{indentwidth}@
+    } }
+
+    hook -group softtab window InsertDelete ' ' %{ try %{
+          execute-keys -draft 'h<a-h><a-k>\A\h+\z<ret>i<space><esc><lt>'
+    } }
+}
+
+hook global WinSetOption soft_tabs=false %{
+    remove-hooks window softtab
+}
+
+# Linting
+define-command lint-on-save-enable %{
+    hook -group lint-on-save buffer BufWritePost .* lint
+}
+define-command lint-on-save-disable %{
+    remove-hooks buffer lint-on-save
+}
+
+# tab/shift-tab for navigating completions
+hook global InsertCompletionShow .* %{ try %{
+    execute-keys -draft hGh<a-K>\A\h+\z<ret>
+    map window insert <tab> <c-n>
+    map window insert <s-tab> <c-p>
+} }
+hook global InsertCompletionHide .* %{
+    unmap window insert <tab> <c-n>
+    unmap window insert <s-tab> <c-p>
+}
+
+# Language-specific editing options
+hook global BufCreate .*[.]sway %{
+    set-option buffer filetype i3
+}
+hook global WinSetOption filetype=clojure %{
+    set-option window indentwidth 2
+    remove-highlighter window/wrapcol
+    parinfer-enable-window -smart
+}
+hook global WinSetOption filetype=go %{
+    set-option window soft_tabs false
+    set-option window tabstop 4
+}
+hook global WinSetOption filetype=grep %{
+    remove-highlighter global/softwrap
+}
+hook global WinSetOption filetype=haskell %{
+    set-option window indentwidth 2
+    set-option window wrapcol 100
+}
+hook global WinSetOption filetype=make %{
+    set-option window soft_tabs false
+}
+hook global WinSetOption filetype=rust %{
+    set-option window wrapcol 100
+}
+hook global WinSetOption filetype=typescript %{
+    set-option window wrapcol 100
+}
+hook global WinSetOption filetype=zig %{
+    set-option window wrapcol 100
+}
+
+evaluate-commands %sh{
+    for f in "$kak_config"/conf.d/*.kak; do
+        printf 'source "%s"\n' "$f"
+    done
+}
+
+declare-option str-to-str-map alacritty_pids
+declare-option str titlefmt '%title'
+
+define-command -hidden get-alacritty-pid %{
+    set-option window modelinefmt %sh{
+        head -c16 /dev/urandom | base64
+    }
+    set-option -add global alacritty_pids %sh{ id=""
+        while [ -z "$id" ]; do
+            id="$(sway-windows | jq --arg title "$kak_opt_modelinefmt - Kakoune" '
+                select(.name == $title) | .pid
+            ')"
+        done
+        printf '%s=%s\n' "$kak_client" "$id"
+    }
+    unset-option window modelinefmt
+}
+
+define-command -hidden set-title -params 1..1 %{
+    nop %sh{
+        printf '%s\n' "$kak_opt_alacritty_pids" | while IFS='=' read -r k v; do
+            [ "$k" = "$kak_client" ] && swaymsg "[pid=${v}] title_format '$1'"
+        done
+    }
+}
+
+hook global ClientCreate '.*' %{
+    nop %sh{ {
+        printf '%s\n' "evaluate-commands -client $kak_client %{
+            get-alacritty-pid
+        }" | kak -p "$kak_session"
+    } > /dev/null 2>&1 < /dev/null & }
+}
+
+hook global ClientClose '.*' %{
+    set-title '%title'
+}
+
+hook global WinSetOption 'titlefmt=.*' %{
+    set-title %opt{titlefmt}
+    echo %val{client}
+}
+
+hook global WinDisplay '.*' %{
+    set-title %opt{titlefmt}
+}
+
+hook global GlobalSetOption 'alacritty_pids=.*' %{
+    set-pid
+    set-title %opt{titlefmt}
+}
+
+hook global WinCreate '.*' %{
+    set-pid
+    update-title
+}
+
+define-command -hidden update-title %{
+    set-option window titlefmt %sh{ printf '%s\n' "$kak_session $kak_bufname" }
+}
+
+declare-option str alacritty_pid
+define-command -hidden set-pid %{
+    set-option window alacritty_pid %sh{
+        printf '%s\n' "$kak_opt_alacritty_pids" | while IFS='=' read -r k v; do
+            [ "$k" = "$kak_client" ] && printf '%s\n' "$v"
+        done
+    }
+}

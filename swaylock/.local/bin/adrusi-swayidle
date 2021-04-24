@@ -1,0 +1,35 @@
+#!/bin/sh
+
+min() {
+    expr "$1" \* 60 + "${2:-0}"
+}
+
+lock="swaylock -f --screenshots --effect-blur 20x3 --fade-in 0.5"
+lock='swaylock -f \
+    --screenshots --effect-blur 20x3 --fade-in 0.5 \
+    --inside-color       00000000 \
+    --inside-clear-color 00000000 \
+    --inside-ver-color   00000000 \
+    --inside-wrong-color 00000000 \
+    --text-color         00000000 \
+    --text-clear-color   00000000 \
+    --text-ver-color     00000000 \
+    --text-wrong-color   00000000 \
+    --line-color         d8dee9ff \
+    --line-clear-color   d8dee9ff \
+    --line-ver-color     d8dee9ff \
+    --line-wrong-color   d8dee9ff \
+    --ring-color         2e3440ff \
+    --ring-clear-color   2e3440ff \
+    --ring-ver-color     d8dee9ff \
+    --ring-wrong-color   bf616aff \
+    --separator-color    00000000 \
+    --key-hl-color       d8dee9ff \
+'
+
+exec swayidle -w \
+    timeout $(min 15)    'loginctl lock-session' \
+    timeout $(min 15 30) 'swaymsg "output * dpms off"' \
+    resume               'swaymsg "output * dpms on"' \
+    before-sleep         "$lock" \
+    lock                 "$lock"

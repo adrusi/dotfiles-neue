@@ -1,0 +1,7 @@
+location=top_right
+width=20%
+#height=40%
+xoffset=-6
+allow_images=true
+dynamic_lines=true
+lines=10

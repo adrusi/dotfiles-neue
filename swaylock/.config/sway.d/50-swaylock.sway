@@ -1,0 +1,2 @@
+exec ~/.local/bin/adrusi-swayidle
+bindsym $mod+Escape exec loginctl lock-session

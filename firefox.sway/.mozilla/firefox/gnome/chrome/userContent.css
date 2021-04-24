@@ -1,0 +1,5 @@
+@-moz-document url("moz-extension://08d8f48c-33b3-41ac-bf00-0c4bc7deaa30/sidebar/sidebar.html") {
+    :root, html, body {
+         background: transparent !important;
+    }
+}

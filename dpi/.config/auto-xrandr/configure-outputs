@@ -1,0 +1,14 @@
+#!/bin/sh
+tee /tmp/autoxrandr | while read -r output product serial; do
+    case "$product:$serial" in
+    30471:320308)
+        xrandr --output "$output" --scale 1.5x1.5 --pos 0x0 --primary
+        ;;
+    30471:320295)
+        xrandr --output "$output" --scale 1.5x1.5 --pos 5760x0
+        ;;
+    5295:0)
+        xrandr --output "$output" --scale 2x2     --pos 3840x3240
+        ;;
+    esac
+done
